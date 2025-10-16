@@ -1,7 +1,7 @@
 dataBase:
   dbHost: "localhost"
   dbPort: "5432"
-  dbName: "shop"
+  dbName: "users"
   dbUser: "postgres"
   dbPassword: "7777777"
 

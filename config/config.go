@@ -27,13 +27,28 @@ type Config struct {
 
 func NewConfig() (*Config, error) {
 	var config Config
-	pathToYamlFile := "../../config/config.yaml"
-	configFile, err := os.Open(pathToYamlFile)
-	if err != nil {
-		return nil, fmt.Errorf("error decode config file: %w", err)
+	paths := []string{
+		"config/config.yaml",    // если запускаем из корня
+		"../config/config.yaml", // если запускаем из cmd/
+		"./config.yaml",         // если файл рядом
 	}
 
-	defer configFile.Close() //Закрытие файла confige после отработки текущей функции
+	var configFile *os.File
+	var err error
+
+	for _, path := range paths {
+		configFile, err = os.Open(path)
+		if err == nil {
+			fmt.Println("✅ Нашел config.yaml по пути:", path)
+			break
+		}
+	}
+
+	if configFile == nil {
+		return nil, fmt.Errorf("не могу найти config.yaml ни в одном месте")
+	}
+
+	defer configFile.Close()
 
 	configBytes, err := io.ReadAll(configFile)
 	if err != nil {
@@ -50,5 +65,6 @@ func NewConfig() (*Config, error) {
 }
 
 func (config *Config) GetDsn() string {
-	return "postgres://" + config.DataBase.DBUser + ":" + config.DataBase.DBPassword + "@" + config.DataBase.DBHost + ":" + config.DataBase.DBPassword + "/" + config.DataBase.DBName + "?sslmode=disable"
+	return "postgres://" + config.DataBase.DBUser + ":" + config.DataBase.DBPassword + "@" + config.DataBase.DBHost +
+		":" + config.DataBase.DBPort + "/" + config.DataBase.DBName + "?sslmode=disable"
 }
