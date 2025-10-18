@@ -31,8 +31,8 @@ func (r *Repository) Insert(ctx context.Context, user *User) (*User, error) {
 		return nil, fmt.Errorf("error encrypting password: %w", err)
 	}
 
-	query := `INSERT INTO users (fname, lname, email, passwordHash) VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING userID, fname, lname, email, passwordHash`
+	query := `INSERT INTO users (userid, fname, lname, age, email, passwordHash) VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING userID, fname, lname,age, email, passwordHash`
 	err = r.conn.QueryRow(ctx, query,
 		user.UserID, user.Fname, user.Lname, user.Age, user.Email, password).Scan(&newUser.UserID, &newUser.Fname, &newUser.Lname, &newUser.Age, &newUser.Age, &newUser.Email, &newUser.PasswordHash)
 
@@ -50,7 +50,7 @@ func (r *Repository) Update(ctx context.Context, user *User) (*User, error) {
 		return nil, fmt.Errorf("error encrypting password: %w", err)
 	}
 
-	query := `UPDATE  users SET fname = $1, lname = $2, email = $3, passwordHash = $4, passwordHash = $5, WHERE userId = $6 RETURNING fname,lname,age,email,passwordHash`
+	query := `UPDATE  users SET fname = $1, lname = $2, age = $3, email = $4, passwordHash = $5, WHERE userId = $6 RETURNING fname,lname,age,email,passwordHash`
 	err = r.conn.QueryRow(ctx, query,
 		user.Fname, user.Lname, user.Age, user.Email, password, user.UserID).Scan(&updatedUser.Fname, &updatedUser.Lname, &updatedUser.Age, &updatedUser.Email, &updatedUser.PasswordHash)
 
